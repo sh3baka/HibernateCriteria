@@ -8,11 +8,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.List;
 
+import static app.PersonSpecifications.*;
+import static org.springframework.data.jpa.domain.Specification.where;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
     @Autowired
-    UserDAO userDao;
+    PersonRepository repository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -22,58 +25,41 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        List<Person> foundList = userDao.findAllPersonsByName("Name");
+        List<Person> foundList = repository.findAll(hasName("Name"));
 
         System.out.println("---------------------------Found users By Name:---------------------------");
         for (Person person : foundList) {
-            System.out.println("Id: " + person.getId());
-            System.out.println("Name: " + person.getName());
-            System.out.println("Surname: " + person.getSurname());
-            System.out.println("Age: " + person.getAge());
-            System.out.println("Country: " + person.getCountry());
-            System.out.println("Date: " + person.getDate());
-            System.out.println("E-Mail: " + person.getEmail());
-            System.out.println("");
+            printPerson(person);
         }
 
-        foundList = userDao.findByNameAndAge("Name", 22);
+        foundList = repository.findAll(where(hasName("Name")).and(hasAgeGraterThan(18)));
         System.out.println("---------------------------Found users By Name and Age:---------------------------");
         for (Person person : foundList) {
-            System.out.println("Id: " + person.getId());
-            System.out.println("Name: " + person.getName());
-            System.out.println("Surname: " + person.getSurname());
-            System.out.println("Age: " + person.getAge());
-            System.out.println("Country: " + person.getCountry());
-            System.out.println("Date: " + person.getDate());
-            System.out.println("E-Mail: " + person.getEmail());
-            System.out.println("");
+            printPerson(person);
         }
 
-        foundList = userDao.findByNameNotEquals("Name");
-        System.out.println("---------------------------Found users By Name not Like:---------------------------");
+        foundList = repository.findAll(where(hasName("Name").and(hasAgeGraterThan(15)).and(hasCountry("Latvia"))));
+        System.out.println("---------------------------Found users By Name , Age, Country:---------------------------");
         for (Person person : foundList) {
-            System.out.println("Id: " + person.getId());
-            System.out.println("Name: " + person.getName());
-            System.out.println("Surname: " + person.getSurname());
-            System.out.println("Age: " + person.getAge());
-            System.out.println("Country: " + person.getCountry());
-            System.out.println("Date: " + person.getDate());
-            System.out.println("E-Mail: " + person.getEmail());
-            System.out.println("");
+            printPerson(person);
         }
 
-        foundList = userDao.findByNameOrCountryEquals("Homer", "Latvia");
+        foundList = repository.findAll(where(hasName("Homer").or(hasCountry("Russia"))));
         System.out.println("---------------------------Found users By Name or Country:---------------------------");
         for (Person person : foundList) {
-            System.out.println("Id: " + person.getId());
-            System.out.println("Name: " + person.getName());
-            System.out.println("Surname: " + person.getSurname());
-            System.out.println("Age: " + person.getAge());
-            System.out.println("Country: " + person.getCountry());
-            System.out.println("Date: " + person.getDate());
-            System.out.println("E-Mail: " + person.getEmail());
-            System.out.println("");
+            printPerson(person);
         }
+    }
+
+    private void printPerson(Person person) {
+        System.out.println("Id: " + person.getId());
+        System.out.println("Name: " + person.getName());
+        System.out.println("Surname: " + person.getSurname());
+        System.out.println("Age: " + person.getAge());
+        System.out.println("Country: " + person.getCountry());
+        System.out.println("Date: " + person.getDate());
+        System.out.println("E-Mail: " + person.getEmail());
+        System.out.println("");
     }
 
 }
